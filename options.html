@@ -1,0 +1,84 @@
+<html>
+
+<head>
+
+<title>Options for Color Chooser</title>
+<script type="text/javascript" src="jquery.min.js"></script>
+<script type="text/javascript" src="jquery.sha1.js"></script>
+
+<script type="text/javascript">
+
+function loadOptions() {
+	var user = localStorage["username"];
+	if(user.typeOf == "undefined")
+		user = "";
+	document.getElementById("username").value = user;
+	testConnection(localStorage["username"],localStorage["password"]);
+}
+
+function saveOptions() {
+	localStorage["username"] = document.getElementById("username").value;
+	localStorage["password"] = $.sha1(document.getElementById("password").value);
+	testConnection(localStorage["username"],localStorage["password"]);
+}
+
+function testConnection(vu,vp)
+{
+	$.getJSON('http://legendarydefense.net/trakt/trakt_testuser.php?trakt_user='+vu+'&trakt_pass='+vp, function(data) 
+  	{
+  	 if(data.status=="success")
+  	 {
+  		$("#status").html("<b style='color:green'>successfully connected</b>");
+  	 }
+  	 else
+  	 {
+  		$("#status").html("<b style='color:red'>failure</b>");
+  	 }
+  	});
+}
+
+function eraseOptions() {
+	localStorage.removeItem("username");
+	localStorage.removeItem("password");
+	location.reload();
+}
+    
+</script>
+
+
+</head>
+
+<body onload="loadOptions()">
+<center>
+    <h1>trakt.tv Login</h1>
+
+	Username: <input id="username" size="8"><br>
+	Password: <input id="password" size="8" type="password"><br>
+	<div id="status"></div>
+    <br />
+
+    <button onclick="saveOptions()">Save</button>
+
+    <br />
+
+    <button onclick="eraseOptions()">delete</button>
+    
+    <br>
+    <a href="http://trakt.tv/join">Register</a>
+    
+</center>
+
+<script type="text/javascript"><!--
+google_ad_client = "ca-pub-3003920357099437";
+/* asd */
+google_ad_slot = "5942724741";
+google_ad_width = 728;
+google_ad_height = 90;
+//-->
+</script>
+<script type="text/javascript"
+src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+</body>
+
+</html>

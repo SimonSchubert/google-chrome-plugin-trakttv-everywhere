@@ -1,0 +1,22 @@
+{
+  "name": "trakt.tv Everywhere",
+  "version": "0.1",
+  "manifest_version": 1,
+  "description": "Adds an seen and checkin button to hulu/kinox.to Streams.",
+  "background_page": "background.html",
+  "options_page": "options.html",
+  "icons": { "16": "icon16.png",
+           "48": "icon48.png",
+          "128": "icon128.png" },
+  "browser_action": {
+    "default_icon": "icon.png"
+  },
+  "content_scripts": [ {
+      "js": [ "jquery.min.js","jquery.storage.js","trakker.js" ],
+      "matches": [ "http://kinox.to/Stream/*","http://www.hulu.com/watch/*","http://www.imdb.com/*","http://www.southpark.de/alleEpisoden*","http://www.southparkstudios.com/full-episodes*" ],
+      "css": [ "trakt-buttons.css" ]
+   } ],
+  "permissions": [
+    "tabs","http://http://legendarydefense.net/trakt/"
+  ]
+}

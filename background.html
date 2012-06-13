@@ -1,0 +1,24 @@
+<html>
+<script>
+chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
+console.log("got request");
+    if(request.eventName == "getLogin") {
+       sendResponse({user: localStorage["username"], pass: localStorage["password"]});
+    }
+
+    if(request.cmd == "load") {
+
+    }
+});
+
+if(localStorage["username"]=="")
+{
+	chrome.tabs.create({url: "options.html"});
+}
+</script>
+
+<body>
+test
+</body>
+
+</html>
