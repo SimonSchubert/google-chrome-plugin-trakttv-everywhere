@@ -5,11 +5,11 @@
   "description": "Adds seen/checkin/watchlist buttons to hulu.com/imdb.com/southparkstudios.com/southpark.de/kinox.to.",
   "background_page": "background.html",
   "options_page": "options.html",
-  "icons": { 	"16": "icon16.png",
-           	"48": "icon48.png",
-		"128": "icon128.png" },
+  "icons": { "16": "icon16.png",
+           "48": "icon48.png",
+          "128": "icon128.png" },
   "browser_action": {
-    		"default_icon": "icon.png"
+    "default_icon": "icon.png"
   },
   "content_scripts": [ {
       "js": [ "jquery.min.js","jquery.storage.js","trakker.js" ],

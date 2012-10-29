@@ -89,6 +89,7 @@ http://trakt.tv: <img src="http://trakt.us/images/arrow-down-on.png" alt="status
 <br><br>
 <button onclick="saveOptions()">save</button>
 <button onclick="eraseOptions()">delete</button>
+<button onclick="loadOptions()">load</button> 
 <br>
 <a href="http://trakt.tv/join" target="_blank">Register at trakt.tv</a>
     
