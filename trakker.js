@@ -1,11 +1,11 @@
-/**************************************************
-*		trakttv Everywhere		  *
-*	 Author: Simon Schubert			  *
-*	 Email: sschubert89@gmail.com		  *
-*   github: https://github.com/SimonSchubert/     *
-*	 google-chrome-plugin-trakttv-everywhere  *
-*						  *
-**************************************************/
+/****************************************************
+*		trakttv Everywhere		  					*
+*	 Author: Simon Schubert			  				*
+*	 Email: sschubert89@gmail.com		  			*
+*   github: https://github.com/SimonSchubert/     	*
+*	 google-chrome-plugin-trakttv-everywhere  		*
+*						  							*
+****************************************************/
 
 vuser = '';
 vpass = "";
@@ -507,7 +507,7 @@ function addSeenButton()
 		}
 		else
 		{
-		$('<div class="trakt-button button-success" id="trakt-success">Success</div>').insertAfter(".trakt-button.button-watchlist");
+			$('<div class="trakt-button button-success" id="trakt-success">Success</div>').insertAfter(".trakt-button.button-watchlist");
 		}
 	
 	$('<div class="trakt-button button-failure" id="trakt-failure">Failure</div>').insertAfter("#trakt-success");
@@ -554,6 +554,10 @@ function addSeenButton()
 		appendButtons();	
 	}
 	
+	var buttons = $('.trakt-button');
+	for (var i = 0; i < buttons.length; i++) {
+		buttons[i].addEventListener('click', trackButtonClick);
+	}
 	
 	/* BUTTON ANIMATIONS - SUCCESS, FAILURE, EXIST */
 	function animate_button_failure()
@@ -1058,7 +1062,11 @@ function getShowDataSouthpark()
  } else {
      window.attachEvent('onload',  loadUser());
  }
+ 
 
+ function trackButtonClick(e) {
+	_gaq.push(['_trackEvent', e.target.id, 'clicked']);
+ };
 
 
 
