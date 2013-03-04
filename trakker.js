@@ -11,6 +11,7 @@ vuser = '';
 vpass = "";
 pMode = 0;
 pIMDB=0;pHULU=1;pSOUTHPARK=2;pKINOXTO=3;
+key = "9a7d89858635e8ac7cdf1ae2f652d0cde4c30932";
 
 
 function getPage()
@@ -73,13 +74,13 @@ $(document).ready(function() {
 	else
 	{
 	console.log("save and load seen-shows json object to local storage"); 
-  		$.getJSON('http://legendarydefense.net/trakt/trakt_getshows.php?trakt_user='+vuser, function(data2) 
+  		$.getJSON('http://royalkoala.com/trakttv/trakt_getshows.php?trakt_user='+vuser, function(data2) 
   		{
 			datashows = data2;
 			$.Storage.set("seen-shows-date", ts.toString());
 			$.Storage.set("seen-shows", JSON.stringify(data2));	//save
 			
-			$.getJSON('http://legendarydefense.net/trakt/trakt_getmovies.php?trakt_user='+vuser, function(data3) 
+			$.getJSON('http://royalkoala.com/trakttv/trakt_getmovies.php?trakt_user='+vuser, function(data3) 
   			{
   				datamovies = data3;
 				$.Storage.set("seen-movies", JSON.stringify(data3));
@@ -181,6 +182,72 @@ function loadSeenSouthpark()
 
 function loadSeenImdb()
 {
+
+	if($(".infobar").text().search("TV Series")!=-1)
+	{
+   	var tmp = $('meta[property="og:url"]').attr("content").split("/");
+	var imdbid = tmp[tmp.length-2];
+	
+	$.getJSON('http://api.trakt.tv/user/progress/watched.json/3fb2e1f1c380194f9599f218c6d1ccd6/'+vuser+'/'+imdbid, function(data) 
+  	{	
+	console.log(data);
+ 	$.each(data, function(key, show) {
+		console.log(show);
+		if(show.show.imdb_id==imdbid)
+		{
+			$('.infobar').append('<div style="color:#136cb2">'+show.progress.percentage+' % ('+show.progress.completed+'/'+show.progress.aired+')</div>');
+			if(show.progress.percentage==100)
+			{
+				$('#img_primary').find("a").prepend("<div class='overlay-watched-big' style='left:"+cssleft+"px;bottom: 10px;'></div>");
+			}	
+		}
+		});
+
+	});
+
+	}
+	
+	if(window.location.toString().search("/search/")!=-1)	
+	{
+	var imdb_ids;
+		if(window.location.toString().search("title_type=tv_serie")!=-1)	
+		{
+		$('#main').find('.detailed').each(function() {
+			
+			var that = $(this);
+			var tmphref = $(this).find('.image').find('a').attr("href");
+			
+			if(tmphref)
+			{
+			tmphref = tmphref.split("/");
+			var imgimdb;
+			for(var p=0 ; p<tmphref.length ; p++)
+			{
+				if(tmphref[p]=="title")
+					imgimdb = tmphref[p+1];
+			}
+			}
+			imdb_ids += imgimdb+',';
+			console.log(that.find('.number').text());
+		});
+		
+		
+			$.getJSON('http://api.trakt.tv/user/progress/watched.json/3fb2e1f1c380194f9599f218c6d1ccd6/'+vuser+'/'+imdb_ids, function(data) 
+			{	
+			//console.log(data);
+			$.each(data, function(key, show) {
+				console.log(show);
+				$('a[href*="'+show.show.imdb_id+'"]').parent().find('.year_type').append('<span style="color:#136cb2"> '+show.progress.percentage+' % ('+show.progress.completed+'/'+show.progress.aired+')</span>');
+					if(show.progress.percentage==100)
+					{
+					$('a[href*="'+show.show.imdb_id+'"]').find('img').parent().prepend("<div class='overlay-watched' style='left:"+-1+"px;bottom: 0px;'></div>");
+					}	
+				});
+			});
+		
+		}
+	}
+
 	if(window.location.toString().search("/chart/")!=-1)	
 	{
 		/*** IMDB charts highlighting **/
@@ -200,17 +267,83 @@ function loadSeenImdb()
 			}
 
     		 $.each(datamovies, function(key, show) {
-
-			 if(show.imdb_id == imgimdb)
-			 {
-    		 	that.css("background-color","black");
-				that.find("td").css("color","white");
-    		 }
-    		
+				 if(show.imdb_id == imgimdb)
+				 {
+					that.css("background-color","#4DBCE9");
+					that.find("td").css("color","white");
+					that.find("a").css("color","white");
+				 }	
     		 });
+			 
     		}
     		
 		});
+	}
+	else
+	if(window.location.toString().search("episodes")!=-1)	
+	{
+	console.log("episodes");
+	loadSeenImdbEpisodes();
+	
+	var loaded = 0;
+		
+	
+	$("#episodes_content").bind("DOMSubtreeModified", function() {	
+		if(loaded==0)
+		{
+		console.log("#episodes_content - modified");
+		loaded = 1;
+		$(document).ready(function() {
+			setTimeout(
+				function() 
+				{
+				loadSeenImdbEpisodes();
+				loaded = 0;
+				}, 2000);
+			});
+		}
+
+	});
+	
+	function loadSeenImdbEpisodes()
+	{
+		var imdbid = $("#bySeason").attr("tconst");
+		var season = $("#bySeason option:selected").text();
+		season = season.replace(/\s/g, '');
+
+		$('#episodes_content').find(".list_item").each(function() {
+			var that = $(this);
+			var episode = $(this).find("meta").attr( "content" );
+
+
+			episode = episode.replace(/\s/g, '');
+			console.log(imdbid + "," + season + "," +  episode);
+
+  			$.each(datashows, function(key, show) {
+  	
+			if(show.imdb_id == imdbid)
+			{
+			
+			var selectids;
+			for(var i=0;i<show.seasons.length;i++)
+			{
+				if(show.seasons[i].season.toString() == season)
+				{
+				selectids = show.seasons[i].episodes.toString().split(",");
+				}
+			}
+			
+			var width = that.find("img").width()-55;
+			var height = that.find("img").height()+3;
+			if(jQuery.inArray(episode, selectids)!=-1)
+				that.find("a").find("div.hover-over-image").append("<div class='overlay-watched' style='left:"+width+"px;bottom:"+height+"px'></div>");
+
+			//console.log(jQuery.inArray(episode, selectids));
+    			}
+
+    			});
+		});
+	}
 	}
 	else
 	{
@@ -219,7 +352,7 @@ function loadSeenImdb()
 		{
 			var orgimgwidth = parseInt($('#img_primary').find("a").find("img").css("width"));
     		//var shadowwidth = parseInt($('#img_primary').find("a").find("img").css("-webkit-box-shadow").split("px")[2],0);
-			var cssleft = (orgimgwidth - 55);
+			var cssleft = (orgimgwidth - 75);
 			
 			var tmphref = window.location.toString().split("/");
 
@@ -232,17 +365,41 @@ function loadSeenImdb()
 			$.each(datamovies, function(key, show) {
 				if(show.imdb_id == imgimdb)
 				{
-    				$('#img_primary').find("a").prepend("<div class='overlay-watched' style='left:"+cssleft+"px;bottom: 10px;'></div>");
-    			}
-    		});
+    				$('#img_primary').find("a").prepend("<div class='overlay-watched-big' style='left:"+cssleft+"px;bottom: 10px;'></div>");
+    				}
+    			});
 			
 			
 		}
 		
+	addImdbASeen();
+
+	}
+	
+	var loadedRecently = 0;
+
+	$("#rvi-div").bind("DOMSubtreeModified", function() {
+		if(loadedRecently==0)
+		{
+		console.log(".recently-viewed modified");
+			loadedRecently = 1;
+			$(document).ready(function() {
+			setTimeout(
+				function() 
+				{
+				addImdbASeen();
+				loadedRecently = 0;
+				}, 200);
+			});
+		}
+	});
+	
+	function addImdbASeen()
+	{	
 	$('a[href*="/title/"]').each(function() {
 	/*** IMDB add seen image to imdb image links **/
-	
-    	if($(this).has("img").length>0)
+
+    	if($(this).has("img").length>0 && !$(this).parent().hasClass('imdbRatingPlugin'))
     	{
 			var that = $(this);
 			var imgimdb;
@@ -255,14 +412,16 @@ function loadSeenImdb()
 			}
 			
 			var orgimgwidth = parseInt($(this).find("img").css("width"));
-    		var shadowwidth = parseInt($(this).find("img").css("-webkit-box-shadow").split("px")[2],0);
-			var cssleft = (orgimgwidth - 55 + shadowwidth);
+			var overlaywidth = orgimgwidth / 2;
+    		//var shadowwidth = parseInt($(this).find("img").css("-webkit-box-shadow").split("px")[2],0);
+			var cssleft = (orgimgwidth - 55 );//+ shadowwidth);
 
     		$.each(datamovies, function(key, show) {
 				if(show.imdb_id == imgimdb)
 				{
+				console.log(imgimdb);
     				that.has("img").prepend("<div class='overlay-watched' style='left:"+cssleft+"px'></div>");
-    			}
+    				}
     		});
 
     	}
@@ -342,10 +501,18 @@ function addSeenButton()
 	
 	function appendButtons()
 	{
-		$('<div class="trakt-button button-success" id="trakt-success">Success</div>').insertAfter(".trakt-button.button-checkin");	
-		$('<div class="trakt-button button-failure" id="trakt-failure">Failure</div>').insertAfter("#trakt-success");
-		$('<div class="trakt-button button-exist" id="trakt-exist">Already Seen</div>').insertAfter("#trakt-failure");
-		$('<img id="trakt-loading" src="'+chrome.extension.getURL("load.gif")+'">').insertAfter("#trakt-exist");
+		if ($('.button-checkin').length > 0) 
+		{
+        	$('<div class="trakt-button button-success" id="trakt-success">Success</div>').insertAfter(".trakt-button.button-checkin");
+		}
+		else
+		{
+		$('<div class="trakt-button button-success" id="trakt-success">Success</div>').insertAfter(".trakt-button.button-watchlist");
+		}
+	
+	$('<div class="trakt-button button-failure" id="trakt-failure">Failure</div>').insertAfter("#trakt-success");
+	$('<div class="trakt-button button-exist" id="trakt-exist">Already Seen</div>').insertAfter("#trakt-failure");
+	$('<img id="trakt-loading" src="'+chrome.extension.getURL("load.gif")+'">').insertAfter("#trakt-exist");
 	}
 	
 	if(pMode==pKINOXTO)
@@ -370,10 +537,13 @@ function addSeenButton()
 	else
 	if(pMode==pIMDB)
 	{
-		if($(".tv_header").length>0)
-			$('<div id="traktv"><a class="trakt-button button-seen" id="add-seen-show-imdb">Seen</a> <a class="trakt-button button-checkin" id="add-checkin-show-imdb">Check In</a></div><br><br>').prependTo($('#overview-bottom'));
+		if($(".infobar").text().search("TV Series")!=-1)
+			$('<div id="traktv"><a class="trakt-button button-watchlist" id="add-watchlist-show-imdb">Watchlist</a><div id="trakt-show-progress"></div></div><br><br>').prependTo($('#overview-bottom'));
 		else
-			$('<div id="traktv"><a class="trakt-button button-seen" id="add-seen-movie-imdb">Seen</a> <a class="trakt-button button-checkin" id="add-checkin-movie-imdb">Check In</a> <a class="trakt-button button-seen" id="add-watchlist-movie-imdb">Watchlist</a> </div><br><br>').prependTo($('#overview-bottom'));
+		if($(".tv_header").length>0) // episode
+			$('<div id="traktv"><a class="trakt-button button-seen" id="add-seen-show-imdb">Seen</a> <a class="trakt-button button-checkin" id="add-checkin-show-imdb">Check In</a></div><br><br>').prependTo($('#overview-bottom'));
+		else	// movie
+			$('<div id="traktv"><a class="trakt-button button-watchlist" id="add-watchlist-movie-imdb">Watchlist</a> <a class="trakt-button button-seen" id="add-seen-movie-imdb">Seen</a> <a class="trakt-button button-checkin" id="add-checkin-movie-imdb">Check In</a>  </div><br><br>').prependTo($('#overview-bottom'));
 		appendButtons();	
 	}
 	else
@@ -426,10 +596,9 @@ function addSeenButton()
  	 	
  	function add_watchlist_movie(vuser,vpass,vimdb,vtitle,vyear)
  	{
- 		var trakt_url = "http://api.trakt.tv/movie/watchlist/";
 		var request = $.ajax({
 			type: "POST",
-			url: "http://legendarydefense.net/trakt/trakt_transfer.php?trakt_url="+trakt_url,	
+			url: "http://api.trakt.tv/movie/watchlist/"+key,
 			dataType: "json",
 			crossDomain: true,
 			
@@ -461,12 +630,47 @@ function addSeenButton()
 		});
  	}
 
- 	function add_checkin_show(vuser,vpass,vimdb,vtitle,vyear,vseason,vepisode)
+ 	function add_watchlist_show(vuser,vpass,vimdb,vtitle,vyear)
  	{
- 		var trakt_url = "http://api.trakt.tv/show/checkin/";
 		var request = $.ajax({
 			type: "POST",
-			url: "http://legendarydefense.net/trakt/trakt_transfer.php?trakt_url="+trakt_url,	
+			url: "http://api.trakt.tv/show/watchlist/"+key,	
+			dataType: "json",
+			crossDomain: true,
+			
+ 		 	data: {
+   			username: vuser,
+   			password: vpass,
+    			shows: [{
+	    			imdb_id: vimdb,
+	   			title: vtitle,
+	   			year: vyear
+			}]
+				},
+			success: function(data5,data2,data3) {
+				console.log(data5);
+				$("#trakt-loading").css("display","none");
+				if(data5.inserted>0)
+					animate_button_success();
+				else
+				if(data5.already_exist>0)
+					animate_button_exist("Already in Watchlist");
+				else
+					animate_button_failure();
+
+					
+    		},	
+			beforeSend: function(x) {
+				$("#trakt-loading").css("display","block");
+          }
+		});
+ 	}
+
+ 	function add_checkin_show(vuser,vpass,vimdb,vtitle,vyear,vseason,vepisode)
+ 	{
+		var request = $.ajax({
+			type: "POST",
+			url: "http://api.trakt.tv/show/checkin/"+key,	
 			dataType: "json",
 			crossDomain: true,
 			
@@ -487,6 +691,7 @@ function addSeenButton()
 	    			foursquare: localStorage["option_share_foursquare"] === "true" ? true : false
     			}
 				},
+
 			success: function(data5,data2,data3) {
 				console.log(data5);
 				$("#trakt-loading").css("display","none");
@@ -497,21 +702,23 @@ function addSeenButton()
 					animate_button_exist("Already Check In in progress");
 				else
 					animate_button_failure();
-
-					
-    		},	
+	
+    			},	
+			error: function (xhr, ajaxOptions, thrownError) {
+				$("#trakt-loading").css("display","none");
+				console.log(xhr.statusText+","+ajaxOptions+","+thrownError);
+    			},
 			beforeSend: function(x) {
 				$("#trakt-loading").css("display","block");
-          }
+         		}
 		});
  	}
 
  	function add_seen_show(vuser,vpass,vimdb,vtitle,vyear,vseason,vepisode)
  	{
- 		var trakt_url = "http://api.trakt.tv/show/episode/seen/";
 		var request = $.ajax({
 			type: "POST",
-			url: "http://legendarydefense.net/trakt/trakt_transfer.php?trakt_url="+trakt_url,	
+			url: "http://api.trakt.tv/show/episode/seen/"+key,	
 			dataType: "json",
 			crossDomain: true,
 			
@@ -546,10 +753,9 @@ function addSeenButton()
 
  	function add_checkin_movie(vuser,vpass,vimdb,vtitle,vyear)
 	{
- 	var trakt_url = "http://api.trakt.tv/movie/checkin/";
 	var request = $.ajax({
 		type: "POST",
-		url: "http://legendarydefense.net/trakt/trakt_transfer.php?trakt_url="+trakt_url,	
+		url: "http://api.trakt.tv/movie/checkin/"+key,	
 		dataType: "json",
 		crossDomain: true,
  		data: {
@@ -586,10 +792,12 @@ function addSeenButton()
  	
  	function add_seen_movie(vuser,vpass,vimdb,vtitle,vyear)
  	{
- 		var trakt_url = "http://api.trakt.tv/movie/seen/";
+	console.log("t: "+ vtitle);
+	console.log("id: "+ vimdb);
+
 		var request = $.ajax({
 			type: "POST",
-			url: "http://legendarydefense.net/trakt/trakt_transfer.php?trakt_url="+trakt_url,	
+			url: "http://api.trakt.tv/movie/seen/"+key,	
 			dataType: "json",
 			crossDomain: true,
  		 	data: {
@@ -715,6 +923,11 @@ function getShowDataImdb()
    $("#add-watchlist-movie-imdb").click(function(event){
    	var data = getMovieDataImdb();
 	add_watchlist_movie(vuser,vpass,data.imdb,data.title,data.year);
+   });
+
+   $("#add-watchlist-show-imdb").click(function(event){
+   	var data = getMovieDataImdb();
+	add_watchlist_show(vuser,vpass,data.imdb,data.title,data.year);
    });
 
    $("#add-seen-movie-imdb").click(function(event){

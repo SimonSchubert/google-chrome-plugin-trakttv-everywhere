@@ -61,12 +61,24 @@
 	background-position:6px 45%;}
 	
 .overlay-watched{
-	width: 55px;
-	height: 55px;
-	position:relative;
-	margin-bottom: -55px;
+	width: 55px !important;
+	height: 55px !important;
+	position:relative !important;
+	margin-bottom: -55px !important;
+	opacity: 1 !important;
 	background-image: url('chrome-extension://__MSG_@@extension_id__/images/episode-seen.png');
-	background-repeat: no-repeat;}
+	background-repeat: no-repeat !important;
+	background-color: transparent !important;
+	background-size: 100% auto; !important}
+
+.overlay-watched-big{
+	width: 75px;
+	height: 75px;
+	position:relative;
+	margin-bottom: -75px;
+	background-image: url('chrome-extension://__MSG_@@extension_id__/images/episode-seen.png');
+	background-repeat: no-repeat;
+	background-size: 100% auto;}
 	
 .overlay-watched-small{
 	width: 30px;
