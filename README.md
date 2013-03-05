@@ -1,0 +1,26 @@
+## TraktTV Chrome Extension
+
+Feel free to join this project.
+
+## ToDo
+- code/file clean up
+- find more sites to support
+- adding remove watched, remove seen and remove checkin
+
+## Changelog
+- 04.03.2012 IMDB 
+ - Added Tv Series progress and watchlist button support
+- 05.03.2012 IMDB + General
+ - IMDB
+  - Added Checkins for Tv series
+  - Added Seen ribbon for tv series
+  - Changed ribbon size for "People who liked this also liked..." block
+ - General
+  - Adding a personal API-key for use of the extension and adding a library for API calls (based on "Trakt API client for NodeJS", checkin calls are made outside of the library) some communicate directly with the Trakt.tv API
+  - Changing option page with "Checkin option toggle" and prefill of apikey/username/password
+  - Removed pop-up and browser button (didn't have any function as far as I could see)
+  - Made some directories for the source files images/css/js
+
+## License
+Code from "Trakt API client for NodeJS" used [https://github.com/mlamp/node-trakt by hakovala](https://github.com/mlamp/node-trakt), this code is licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at > [http://www.apache.org/licenses/LICENSE-2.0](http://www.apache.org/licenses/LICENSE-2.0) Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+

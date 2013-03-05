@@ -1,46 +1,50 @@
 <html>
-
 <head>
-
-<title>trakt.tv Login</title>
-
-
+<title>Trakt.tv Chrome Extension Settings</title>
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script type="text/javascript" src="js/jquery.storage.js"></script>
+<script type="text/javascript" src="js/jquery.sha1.js"></script>
+<script type="text/javascript" src="js/api-actions.js"></script>
+<script type="text/javascript" src="js/helpers.js"></script>
+<script type="text/javascript" src="js/trakt.js"></script>
+<script type="text/javascript" src="js/options.js"></script>
+<link rel="stylesheet" href="css/trakt-options.css">
 </head>
-
 <body>
-<center>
-    <h1>trakt.tv Login</h1>
-
+<div class="box">
+    <h1>Trakt.tv Chrome Extension Settings</h1>
+<hr>
+<div id="status"></div><div id="status2"></div>
+<h4>API Key</h4>
+<form>
 <table>
-<tr> <td>Username:</td> <td><input id="username" size="8"></td> </tr>
+<tr> <td><input id="apikey" size="60"></td> </tr>
+<tr> <td><small>(this is the default api-key, you can also use your psersonal key, goto <a href="http://trakt.tv/settings/api" target="_blank">this</a> page to copy it and paste it here)</small></td> </tr>
+</table>
+<h4>Login</h4>
+<table>
+<tr> <td>Username:</td> <td><input id="username" size="8"> <small><a href="http://trakt.tv/join" target="_blank">No account? Register at trakt.tv</a></small></td> </tr>
 <tr> <td>Password:</td> <td><input id="password" size="8" type="password"></td> </tr>
 </table>
-
-	<div id="status"></div><div id="status2"></div>
-    <br />
-<b>Options:</b><br>
-	share checkins: 
-	<input type="checkbox" name="option2" id="ckb_option_share_facebook" value="facebook"> facebook 
-	<input type="checkbox" id="ckb_option_share_twitter" value="twitter"> twitter 
-	<input type="checkbox" id="ckb_option_share_tumblr" value="tumblr"> tumblr 
-	<input type="checkbox" id="ckb_option_share_foursquare" value="foursquare"> foursquare
-
-<br><br>
-<b>Status:</b><br>
-trakt.tv Server: <img src="http://trakt.us/images/arrow-down-on.png" alt="status" id="server"/> <br>
-<br><br>
-<button id="button-save">save</button>
-<button id="button-delete">delete</button>
-<br>
-<a href="http://trakt.tv/join" target="_blank">Register at trakt.tv</a>
-    
-</center>
-
-
+<h4>Share checkins</h4>
+<table>
+<tr> <td><input type="checkbox" id="ckb_option_checkin" value="checkin" checked> checkin enabled</td> </tr>
+<tr> <td colspan="2"><hr></td> </tr>
+<tr> <td colspan="2"><input type="checkbox" id="ckb_option_share_facebook" value="facebook"> facebook</td> </tr>
+<tr> <td colspan="2"><input type="checkbox" id="ckb_option_share_twitter" value="twitter"> twitter</td> </tr>
+<tr> <td colspan="2"><input type="checkbox" id="ckb_option_share_tumblr" value="tumblr"> tumblr</td> </tr>
+<tr> <td colspan="2"><input type="checkbox" id="ckb_option_share_foursquare" value="foursquare"> foursquare</td> </tr>
+</table>
+<hr>
+<button id="saveOptions">save</button>
+<button id="eraseOptions">delete</button><br>
+<hr>
+</form>
+<h4>Status domains used with this plugin:</h4>
+<table>
+<tr> <td>http://trakt.tv: <img src="http://trakt.us/images/arrow-down-on.png" alt="status" id="status_trakt"/></td></tr>
+<tr> <td>Plugin Server: <img src="http://royalkoala.com/mail.png" alt="status" id="status_royalkoala"/></td></tr>
+</table>
+</div>
 </body>
-
-<script type="text/javascript" src="jquery.js"></script>
-<script type="text/javascript" src="jquery.sha1.js"></script>
-<script src="options.js"></script>
-
 </html>
