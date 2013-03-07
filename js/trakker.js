@@ -46,6 +46,7 @@ function main() {
 	$(document).ready(function() {
 		var datashows; // JSON Object
 		var datamovies;
+		var dataprogress;
 
 		// Check if the JSON Object is stored in the local storage
 		var ts = Math.round((new Date()).getTime() / 1000);
@@ -54,7 +55,7 @@ function main() {
 			console.log("loading seen-shows json object from local storage - last update :"+(lastupdate));
 			datashows = JSON.parse($.Storage.get("seen-shows")); // Load
 			datamovies = JSON.parse($.Storage.get("seen-movies")); // Load
-
+			dataprogress = JSON.parse($.Storage.get("progress-shows"));
 			//console.log('datashows',datashows);
 			//console.log('datamovies',datamovies);
 
@@ -76,13 +77,19 @@ function main() {
 						if(!err2) {
 							datamovies = res2;
 							$.Storage.set("seen-movies", JSON.stringify(res2));
-			
-							if(pMode == pKINOXTO)
-								loadSeenKinox();
-							if(pMode == pIMDB)
-								loadSeenImdb();
-							if(pMode == pSOUTHPARK)
-								initSouthpark();
+							trakt.request('user', 'progress/watched', {username: config.user,title: "0" , extended: false}, function(err3, res3) {
+							if(!err3) {
+								dataprogress = res3;
+								$.Storage.set("progress-shows", JSON.stringify(res3));
+								if(pMode == pKINOXTO)
+									loadSeenKinox();
+								if(pMode == pIMDB)
+									loadSeenImdb();
+								if(pMode == pSOUTHPARK)
+									initSouthpark();
+							}
+							console.log("err"+err3);
+						});
 						}
 					});
 				}
@@ -193,23 +200,18 @@ function main() {
 						}
 						}
 						imdb_ids += imgimdb+',';
-						console.log(that.find('.number').text());
+						//console.log(that.find('.number').text());
 					});
 
-					trakt.request('user', 'progress/watched', {username: config.user, title: imdb_ids, extended: false}, function(err, res) {
-						console.log(res);
-						if(!err) {
-							$.each(res, function(key, show) {
-								console.log(show);
+							$.each(dataprogress, function(key, show) {
 								$('a[href*="'+show.show.imdb_id+'"]').parent().find('.year_type').append('<span style="color:#136cb2"> '+show.progress.percentage+' % ('+show.progress.completed+'/'+show.progress.aired+')</span>');
-								if(show.progress.percentage==100) {
-									$('a[href*="'+show.show.imdb_id+'"]').find('img').parent().prepend("<div class='overlay-watched' style='left:"+-1+"px;bottom: 0px;'></div>");
+								if(show.progress.percentage==100) 
+								{
+								console.log(show);//.show.title + " 100%");
+								$('a[href*="'+show.show.imdb_id+'"]').find('img').parent().prepend("<div class='overlay-watched' style='left:"+(-1)+"px;bottom: 0px;'></div>");
 								}
 							});
-						} else {
-							console.log(err);
-						}
-					});
+
 				}
 			}
 
@@ -229,14 +231,84 @@ function main() {
 						}
 						$.each(datamovies, function(key, show) {						
 							if(show.imdb_id == imgimdb) {
-							that.css("background-color","black");
-							that.find("td").css("color","white");
+      		that.css("background-color","#4DBCE9");
+	   				that.find("td").css("color","white");
+        that.find("a").css("color","white");
 							}
 						});
 					}
 		
 				});
-			} else {
+			} 
+				else
+	if(window.location.toString().search("episodes")!=-1)	
+	{
+	console.log("episodes");
+	loadSeenImdbEpisodes();
+
+	var loaded = 0;
+
+
+	$("#episodes_content").bind("DOMSubtreeModified", function() {	
+		if(loaded==0)
+		{
+		console.log("#episodes_content - modified");
+		loaded = 1;
+		$(document).ready(function() {
+			setTimeout(
+				function() 
+				{
+				loadSeenImdbEpisodes();
+				loaded = 0;
+				}, 2000);
+			});
+		}
+
+	});
+
+	function loadSeenImdbEpisodes()
+	{
+		var imdbid = $("#bySeason").attr("tconst");
+		var season = $("#bySeason option:selected").text();
+		season = season.replace(/\s/g, '');
+
+		$('#episodes_content').find(".list_item").each(function() {
+			var that = $(this);
+			var episode = $(this).find("meta").attr( "content" );
+
+
+			episode = episode.replace(/\s/g, '');
+			//console.log(imdbid + "," + season + "," +  episode);
+
+  			$.each(datashows, function(key, show) {
+  	
+			if(show.imdb_id == imdbid)
+			{
+
+			var selectids;
+			for(var i=0;i<show.seasons.length;i++)
+			{
+				if(show.seasons[i].season.toString() == season)
+				{
+				selectids = show.seasons[i].episodes.toString().split(",");
+				}
+			}
+
+			var width = that.find("img").width()-55;
+			var height = that.find("img").height()+3;
+			if(jQuery.inArray(episode, selectids)!=-1)
+			{
+				that.find("a").find("div.hover-over-image").find("div").css("bottom",60);
+				that.find("a").find("div.hover-over-image").append("<div class='overlay-watched' style='left:"+width+"px;bottom:"+height+"px'></div>");
+			}
+			//console.log(jQuery.inArray(episode, selectids));
+    			}
+
+    			});
+		});
+	}
+	}
+	else {
 				if($('#img_primary').find("a").find("img").length>0) {
 					var orgimgwidth = parseInt($('#img_primary').find("a").find("img").css("width"));
 
@@ -249,8 +321,8 @@ function main() {
 							imgimdb = tmphref[p+1];
 					}
 
-					$.each(datamovies, function(key, show) {
-						if(show.imdb_id == imgimdb) {
+					$.each(datamovies, function(key, movie) {
+						if(movie.imdb_id == imgimdb) {
 							$('#img_primary').find("a").prepend("<div class='overlay-watched-big' style='left:"+cssleft+"px;bottom: 10px;'></div>");
 						}
 					});
@@ -259,7 +331,7 @@ function main() {
 				$('a[href*="/title/"]').each(function() {
 				/*** IMDB add seen image to imdb image links **/
 
-					if($(this).has("img").length>0) {
+					if($(this).has("img").length>0 && !$(this).parent().hasClass('imdbRatingPlugin')) {
 						var that = $(this);
 						var imgimdb;
 						var tmphref = $(this).attr("href").split("/");
@@ -273,20 +345,77 @@ function main() {
 
 						var cssleft = (orgimgwidth - 55);
 
-						$.each(datamovies, function(key, show) {
-							if(show.imdb_id == imgimdb) {
+						$.each(datamovies, function(key, movie) {
+							if(movie.imdb_id == imgimdb) {
 								that.has("img").prepend("<div class='overlay-watched' style='left:"+cssleft+"px'></div>");
 							}
 						});
 						
-						$.each(datashows, function(key, show) {
-							if(show.imdb_id == imgimdb) {
+						$.each(dataprogress, function(key, show) {
+							if(show.show.imdb_id == imgimdb && show.progress.percentage == 100) {
 								that.has("img").prepend("<div class='overlay-watched' style='left:"+cssleft+"px'></div>");
 							}
 						});
 					}
 				});
 			}
+			
+var loadedRecently = 0;
+
+	$("#rvi-div").bind("DOMSubtreeModified", function() {
+		if(loadedRecently==0)
+		{
+		console.log(".recently-viewed modified");
+			loadedRecently = 1;
+			$(document).ready(function() {
+			setTimeout(
+				function() 
+				{
+				addImdbASeen();
+				loadedRecently = 0;
+				}, 200);
+			});
+		}
+	});
+
+	function addImdbASeen()
+	{	
+	$('a[href*="/title/"]').each(function() {
+	/*** IMDB add seen image to imdb image links **/
+
+    	if($(this).has("img").length>0 && !$(this).parent().hasClass('imdbRatingPlugin'))
+    	{
+			var that = $(this);
+			var imgimdb;
+			var tmphref = $(this).attr("href").split("/");
+
+			for(var p=0 ; p<tmphref.length ; p++)
+			{
+				if(tmphref[p]=="title")
+					imgimdb = tmphref[p+1];
+			}
+
+			var orgimgwidth = parseInt($(this).find("img").css("width"));
+			var overlaywidth = orgimgwidth / 2;
+    		//var shadowwidth = parseInt($(this).find("img").css("-webkit-box-shadow").split("px")[2],0);
+			var cssleft = (orgimgwidth - 55 );//+ shadowwidth);
+
+						$.each(datamovies, function(key, movie) {
+							if(movie.imdb_id == imgimdb) {
+								that.has("img").prepend("<div class='overlay-watched' style='left:"+cssleft+"px'></div>");
+							}
+						});
+						
+						$.each(dataprogress, function(key, show) {
+							if(show.show.imdb_id == imgimdb && show.progress.percentage == 100) {
+								that.has("img").prepend("<div class='overlay-watched' style='left:"+cssleft+"px'></div>");
+							}
+						});
+					}
+				});
+			}
+			
+			
 			if(!allreadyseen)
 				addSeenButton();
 		}
