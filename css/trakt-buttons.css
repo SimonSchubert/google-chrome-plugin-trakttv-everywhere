@@ -59,6 +59,55 @@
 	background-image:url('chrome-extension://__MSG_@@extension_id__/images/icon-check-in.png'); 
 	background-repeat:no-repeat;	
 	background-position:6px 45%;}
+
+.rt-rating-fresh{
+	background-image:url('chrome-extension://__MSG_@@extension_id__/images/rt_0.png'); 
+	background-repeat:no-repeat;
+	background-size: 100% auto;
+	}
+.rt-rating-rotten{
+	background-image:url('chrome-extension://__MSG_@@extension_id__/images/rt_1.png'); 
+	background-repeat:no-repeat;
+	background-size: 100% auto;
+	}
+.rt-rating-certfresh{
+	background-image:url('chrome-extension://__MSG_@@extension_id__/images/rt_2.png'); 
+	background-repeat:no-repeat;
+	background-size: 100% auto;
+	}
+
+.rt-rating-upright{
+	background-image:url('chrome-extension://__MSG_@@extension_id__/images/rt_3.png'); 
+	background-repeat:no-repeat;
+	background-size: 100% auto;
+	}
+.rt-rating-a{
+	background-image:url('chrome-extension://__MSG_@@extension_id__/images/rt_4.png'); 
+	background-repeat:no-repeat;
+	background-size: 100% auto;
+	}
+.rt-rating-b{
+	background-image:url('chrome-extension://__MSG_@@extension_id__/images/rt_5.png'); 
+	background-repeat:no-repeat;
+	background-size: 100% auto;
+	}
+
+.rt-rating{
+	width:18px;
+	height:18px;
+	float: left;
+	display:block;
+	}
+
+.imdb-rating{
+	background-image:url('chrome-extension://__MSG_@@extension_id__/images/imdb_icon.png'); 
+	background-repeat:no-repeat;
+	background-size: 100% auto;
+	width:18px;
+	height:18px;
+	float: left;
+	display:block;
+	}
 	
 .overlay-watched{
 	width: 55px !important;

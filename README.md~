@@ -8,9 +8,11 @@ Feel free to join this project.
 - adding remove watched, remove seen and remove checkin
 
 ## Changelog
-- 04.03.2012 IMDB 
+- 07.03.2013
+ - Improved seen images for imdb
+- 04.03.2013 IMDB 
  - Added Tv Series progress and watchlist button support
-- 05.03.2012 IMDB + General
+- 05.03.2013 IMDB + General
  - IMDB
   - Added Checkins for Tv series
   - Added Seen ribbon for tv series

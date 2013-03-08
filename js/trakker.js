@@ -11,7 +11,7 @@ var config = '';
 var trakt = '';
 var allreadyseen = false;
 pMode = 0;
-pIMDB=0;pHULU=1;pSOUTHPARK=2;pKINOXTO=3;
+pIMDB=0;pHULU=1;pSOUTHPARK=2;pKINOXTO=3;pROTTEN=4;pTRAKT=5;
 
 
 function getPage() {
@@ -21,6 +21,10 @@ function getPage() {
 		pMode = pHULU;
 	} else if(window.location.toString().search("imdb.com")!=-1) {
 		pMode = pIMDB;
+	} else if(window.location.toString().search("rottentomatoes")!=-1) {
+		pMode = pROTTEN;
+	} else if(window.location.toString().search("trakt.tv/movie/")!=-1) {
+		pMode = pTRAKT;
 	} else if(window.location.toString().search("southpark.de/alle-episoden")!=-1||window.location.toString().search("southparkstudios.com/full-episodes")!=-1) {
 		pMode = pSOUTHPARK;
 	}
@@ -51,7 +55,7 @@ function main() {
 		// Check if the JSON Object is stored in the local storage
 		var ts = Math.round((new Date()).getTime() / 1000);
 		var lastupdate = ts-$.Storage.get("seen-shows-date");
-		if( $.Storage.get("seen-shows-date") != null && lastupdate<300 ) {
+		if( $.Storage.get("seen-shows-date") != null && lastupdate<960 ) {
 			console.log("loading seen-shows json object from local storage - last update :"+(lastupdate));
 			datashows = JSON.parse($.Storage.get("seen-shows")); // Load
 			datamovies = JSON.parse($.Storage.get("seen-movies")); // Load
@@ -65,6 +69,10 @@ function main() {
 				loadSeenImdb();
 			if(pMode == pSOUTHPARK)
 				initSouthpark();
+			if(pMode == pROTTEN)
+				loadSeenRotten();
+			if(pMode == pTRAKT)
+				loadTraktExt();
 		} else {
 			console.log("save and load seen-shows and movies json object to local storage"); 
 
@@ -87,6 +95,8 @@ function main() {
 									loadSeenImdb();
 								if(pMode == pSOUTHPARK)
 									initSouthpark();
+								if(pMode == pROTTEN)
+									loadSeenRotten();
 							}
 							console.log("err"+err3);
 						});
@@ -154,6 +164,209 @@ function main() {
 			});
 			addSeenButton();
 		}
+
+function loadTraktExt()
+{
+var tmphref = $('a[href*="www.imdb.com/title/"]').attr("href").split("/");
+var imdb;
+for(var p=0 ; p<tmphref.length ; p++) {
+	if(tmphref[p]=="title")
+		imdb = tmphref[p+1];
+}
+
+var url = "http://api.rottentomatoes.com/api/public/v1.0/movie_alias.json?type=imdb&id="+imdb.replace("tt","")+"&apikey=je7ndjs47343mxz44jtckbdu&_prettyprint=true";
+
+$.getJSON(url, function(data) {
+	console.log(data);
+	var audience_score = data.ratings.audience_score;
+	var critics_score = data.ratings.critics_score;
+	var audience_rating = data.ratings.audience_rating;
+	var critics_rating = data.ratings.critics_rating;
+	var img_class;
+	if(critics_rating=="Fresh")
+		img_class = "rt-rating-fresh";
+	else
+	if(critics_rating=="Certified Fresh")
+		img_class = "rt-rating-certfresh";
+	else
+	if(critics_rating=="Rotten")
+		img_class = "rt-rating-rotten";
+
+	var img2_class;
+	if(audience_rating=="Upright")
+		img2_class = "rt-rating-upright";
+
+	var div1 = "<div style='height:18px;line-height: 18px;'><span style='text-size:18px'>"+critics_score+"</span><span>%</span><div class='"+img_class+" rt-rating'></div></div>";
+
+	var div2 = "<div style='height:18px;line-height: 18px;'><span style='text-size:18px'>"+audience_score+"</span><span>%</span><div class='"+img2_class+" rt-rating'></div></div>";
+
+	div3 = "";
+	$.getJSON("http://www.omdbapi.com/?i="+imdb, function(data) {
+		console.log(data);
+		div3 = "<div style='height:18px;line-height: 18px;'><span style='text-size:18px'>"+data.imdbRating*10+"</span><span>%</span><div class='imdb-rating' style='float:'></div></div>"; // 
+		
+		$(".rating").append("<div style='float:left'>"+div1+div2+div3+"</div>");
+	});
+	
+
+	$("#rating-percent").append("<div style='font-size: 10px;line-height: 10px;'>"+$("#rating-votes").text()+"</div>");
+	$("#rating-votes").remove();
+	$("#summary-overview-wrapper").css("margin-top","-9px");
+});
+
+}
+
+
+function loadSeenRotten()
+{
+console.log("Rotten");
+
+if(window.location.toString().search("/m/")!=-1) {
+var text = $(".movie_title").text();
+var year = $.trim(text.match(/\((.*?)\)/)[1]);
+var splited = text.split("(");
+var title = $.trim(splited[splited.length-2]);
+
+
+$.each(datamovies, function(key, show) {						
+	if(compareRottenDate(show.title, title, show.year, year)) {
+	$(".movie_poster_area").find("img").parent().prepend("<div class='overlay-watched-big' style='left:"+67+"px;'></div>");
+	}
+});
+}
+
+if(window.location.toString().search("/bestofrt/")!=-1) {
+
+	$(".rt_table").find("tr").each(function() {
+
+	var that = $(this);
+	var text = $(this).find("a").text();
+	if(text.length>0)
+	{
+	var splittit = text.split("(");
+	var year = $.trim(splittit[splittit.length-1].replace(")",""));
+	var splited = text.split("(");
+	var title = $.trim(splited[0]);
+		$.each(datamovies, function(key, show) {						
+			if(compareRottenDate(show.title, title, show.year, year)) {
+			console.log("show:" + show.title +",t:"+title+" year:"+show.year+",y:"+year);				
+      			that.css("background-color","#4DBCE9");
+	   		that.find("td").css("color","white");
+        		that.find("a").css("color","white");
+			}
+		});
+	}
+	});
+
+}
+
+	if(window.location.toString().search("/top/")!=-1) {
+
+	$(".content_box").each(function() {
+	console.log($(this).find(".content_header").find("h3,h1").text());
+	var head = $(this).find(".content_header").find("h3,h1").text();
+		if(head.search("Best Movies Of All Time")!=-1)
+		{
+		$(this).find(".movie_list").find("tr").each(function() {
+
+		var that = $(this);
+		var text = $(this).find(".middle_col").text();
+			if(text.length>0)
+			{
+			var splittit = text.split("(");
+			var year = $.trim(splittit[splittit.length-1].replace(")",""));
+			var splited = text.split("(");
+			var title = $.trim(splited[0]);
+				$.each(datamovies, function(key, show) {						
+					if(compareRottenDate(show.title, title, show.year, year)) {
+					console.log("show:" + show.title +",t:"+title+" year:"+show.year+",y:"+year);				
+		      			that.css("background-color","#4DBCE9");
+			   		that.find("td").css("color","white");
+					that.find("a").css("color","white");
+					}
+				});
+			}
+		});
+		}
+		else
+		if(head.search("Best Movies of")!=-1)
+		{
+		var year = $.trim(head.replace("Best Movies of",""));
+		console.log(year);
+		console.log("--------------------");
+
+		$(this).find(".movie_list").find("tr").each(function() {
+
+			var that = $(this);
+			var title = $.trim($(this).find(".middle_col").text());
+
+			$.each(datamovies, function(key, show) {						
+				if(compareRottenDate(show.title, title, show.year, year)) {
+				console.log("show:" + show.title +",t:"+title+" year:"+show.year+",y:"+year);				
+			      	that.css("background-color","#4DBCE9");
+				that.find("td").css("color","white");
+				that.find("a").css("color","white");
+				}
+			});
+		});
+		}
+		else
+		if(head.search("Best Movies By Year")!=-1)
+		{
+		console.log("--------------------");
+
+		$(this).find(".movie_list").find("tr").each(function() {
+
+			var that = $(this);
+			var title = $.trim($(this).find(".middle_col").text());
+			var year = $.trim($(this).find(".rank_col").text());
+
+			$.each(datamovies, function(key, show) {						
+				if(compareRottenDate(show.title, title, show.year, year)) {
+				console.log("show:" + show.title +",t:"+title+" year:"+show.year+",y:"+year);				
+			      	that.css("background-color","#4DBCE9");
+				that.find("td").css("color","white");
+				that.find("a").css("color","white");
+				}
+			});
+		});
+		}
+
+	});
+
+}
+
+
+
+if(window.location.toString().search("/dvd/")!=-1) {
+$(".media_block.movie_item.bottom_divider").each(function() {
+	
+	var that = $(this);
+	var title = $.trim(that.find(".heading").find("h2").text());
+
+	var tmp = that.find(".subtle").text().split("—")[0];
+	var year = $.trim(tmp.split(",")[1]);
+	console.log(title+"-"+year);
+	$.each(datamovies, function(key, show) {
+		//var matches = similar_text(show.title, title);
+		//if(matches>=show.title.length||matches>=title.length&& show.year == year)
+		//console.log("show:"+title+","+show.title+"-"+title.search(show.title));
+		//console.log("show:" + show.title +" "+show.title.length+" ,t:"+title+" ,euqls:"+similar_text(show.title, title));						
+		if(compareRottenDate(show.title, title, show.year, year)) {
+		that.find(".media_block_image").prepend("<div class='overlay-watched' style='left:"+65+"px;'></div>");
+		}
+	});
+});
+
+}
+
+function compareRottenDate(title1, title2, year1, year2)
+{
+return ((title1.search(title2)!=-1 || title2.search(title1)!=-1) && (title1.length - title2.length <=5 && title1.length - title2.length >=-5) && (year1 - year2 >= -1 && year1 - year2 <= 1))
+}
+
+
+}
 
 		function loadSeenImdb() {
 		
@@ -231,9 +444,9 @@ function main() {
 						}
 						$.each(datamovies, function(key, show) {						
 							if(show.imdb_id == imgimdb) {
-      		that.css("background-color","#4DBCE9");
+      					that.css("background-color","#4DBCE9");
 	   				that.find("td").css("color","white");
-        that.find("a").css("color","white");
+        				that.find("a").css("color","white");
 							}
 						});
 					}

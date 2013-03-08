@@ -6,8 +6,17 @@ Feel free to join this project.
 - code/file clean up
 - find more sites to support
 - adding remove watched, remove seen and remove checkin
-
+- rottentomatoes.com
+ - seen/checking.. buttons
+ - Rt html source has no imdb ids and the rt api gives me no chance to get the id by link for example: (http://www.rottentomatoes.com/m/waste-land/) api: (http://developer.rottentomatoes.com/docs). And geting the trakt data by title and dvd release date is not 100% efficient. 
+- trakt.tv extension
+ - get rt rating vote numbers and calculate the total rating of all
+- adding options to disable parts of the plugin
+ 
 ## Changelog
+- 08.03.2013
+ - Added (seen highlighting) support for rottentomatoes.com/top/, rottentomatoes.com/top/bestofrt/*, www.rottentomatoes.com/m/*
+ - Added an little extension for trakt.tv movie sites, features:imdb rating,rottentomatoes critics and audience ratings
 - 07.03.2013
  - Improved seen images for imdb
 - 04.03.2013 IMDB 
