@@ -4,7 +4,6 @@ Feel free to join this project.
 
 ## ToDo
 - code/file clean up
-- find more sites to support
 - adding remove watched, remove seen and remove checkin
 - rottentomatoes.com
  - seen/checking.. buttons
@@ -12,7 +11,8 @@ Feel free to join this project.
 - trakt.tv extension
  - get rt rating vote numbers and calculate the total rating of all
 - adding options to disable parts of the plugin
- 
+- red watchlist ribbon on movies that are already watchlist, adding a rating above the seen it badge
+
 ## Changelog
 - 08.03.2013
  - Added (seen highlighting) support for rottentomatoes.com/top/, rottentomatoes.com/top/bestofrt/*, www.rottentomatoes.com/m/*
