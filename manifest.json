@@ -11,7 +11,7 @@
 		"128": "images/icon128.png" },
   "content_scripts": [ {
   		"js": [ "js/jquery.min.js","js/jquery.storage.js","js/trakker.js","js/helpers.js","js/trakt.js","js/api-actions.js","js/jquery.sha1.js","js/similar_text.js" ],
-		"matches": [ "http://kinox.to/Stream/*","http://www.hulu.com/watch/*","http://www.imdb.com/*","http://www.southpark.de/alle-episoden*","http://www.southparkstudios.com/full-episodes*","http://www.rottentomatoes.com/*","http://trakt.tv/movie/*" ],
+		"matches": [ "http://kinox.to/Stream/*","http://www.imdb.com/*","http://www.southpark.de/alle-episoden*","http://www.southparkstudios.com/full-episodes*","http://www.rottentomatoes.com/*","http://trakt.tv/movie/*" ],
 		"css": [ "css/trakt-buttons.css" ]
    } ],
   "content_security_policy": 
