@@ -536,7 +536,7 @@ return ((title1.search(title2)!=-1 || title2.search(title1)!=-1) && (title1.leng
 
 					$.each(datamovies, function(key, movie) {
 						if(movie.imdb_id == imgimdb) {
-							$('#img_primary').find("a").prepend("<div class='overlay-watched-big' style='left:"+cssleft+"px;bottom: 10px;'></div>");
+							$('#img_primary').find("a:first").prepend("<div class='overlay-watched-big' style='left:"+cssleft+"px;bottom: 10px;'></div>");
 						}
 					});
 				}
