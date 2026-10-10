@@ -1,3 +1,9 @@
+/*
+ * Based on "Trakt API client for NodeJS" by hakovala
+ * (https://github.com/hakovala/node-trakt), licensed under the Apache License,
+ * Version 2.0 (http://www.apache.org/licenses/LICENSE-2.0).
+ * Modified for this extension: ported to the browser, uses jQuery for requests.
+ */
 var base_url = 'https://api.trakt.tv';
 
 var Trakt = function (options) {
